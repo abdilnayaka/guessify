@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guessify</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e0f7fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #00bcd4; /* Aqua */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #004d40; /* Darker Aqua */
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-size: 16px;
+            color: #004d40; /* Darker Aqua */
+        }
+
+        input, select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input:disabled {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #00796b; /* Dark Aqua */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #004d40; /* Darker Aqua */
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #004d40; /* Darker Aqua */
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Guessify</h1>
+
+        <label for="difficulty">Select Difficulty Level:</label>
+        <select id="difficulty">
+            <option value="beginner">Beginner (1-100, 15 attempts)</option>
+            <option value="intermediate">Intermediate (1-200, 20 attempts)</option>
+            <option value="hard">Hard (1-400, 25 attempts)</option>
+            <option value="superhard">Super Hard (1-500, 25 attempts)</option>
+            <option value="impossible">Impossible (1-1000, 30 attempts)</option>
+        </select>
+
+        <label for="guess">Enter a Number:</label>
+        <input type="number" id="guess" placeholder="Enter a number" disabled>
+
+        <button onclick="startGame()">Start Game</button>
+        <button id="guessButton" onclick="checkGuess()" disabled>Guess</button>
+
+        <div class="result" id="result"></div>
+
+        <div class="footer">Guessify by Anayaka</div>
+    </div>
+
+    <script>
+        let targetNumber, maxAttempts, attempts, maxNumber;
+
+        function startGame() {
+            const difficulty = document.getElementById('difficulty').value;
+
+            switch (difficulty) {
+                case 'beginner':
+                    maxNumber = 100;
+                    maxAttempts = 15;
+                    break;
+                case 'intermediate':
+                    maxNumber = 200;
+                    maxAttempts = 20;
+                    break;
+                case 'hard':
+                    maxNumber = 400;
+                    maxAttempts = 25;
+                    break;
+                case 'superhard':
+                    maxNumber = 500;
+                    maxAttempts = 25;
+                    break;
+                case 'impossible':
+                    maxNumber = 1000;
+                    maxAttempts = 30;
+                    break;
+            }
+
+            targetNumber = Math.floor(Math.random() * maxNumber) + 1;
+            attempts = 0;
+
+            document.getElementById('result').innerText = `Game started! You have ${maxAttempts} attempts to guess the number between 1 and ${maxNumber}.`;
+            document.getElementById('guess').disabled = false;
+            document.getElementById('guessButton').disabled = false;
+        }
+
+        function checkGuess() {
+            const guess = parseInt(document.getElementById('guess').value);
+            attempts++;
+
+            if (isNaN(guess) || guess < 1 || guess > maxNumber) {
+                document.getElementById('result').innerText = `Please enter a number between 1 and ${maxNumber}.`;
+                return;
+            }
+
+            if (guess === targetNumber) {
+                const score = calculateScore(attempts);
+                document.getElementById('result').innerText = `Congratulations! You guessed the correct number (${targetNumber}) in ${attempts} attempts. Your final score: ${score}.`;
+                document.getElementById('guess').disabled = true;
+                document.getElementById('guessButton').disabled = true;
+            } else if (attempts >= maxAttempts) {
+                document.getElementById('result').innerText = `You've reached the maximum number of attempts (${maxAttempts}). Game over! The correct number was ${targetNumber}. Please start a new game.`;
+                document.getElementById('guess').disabled = true;
+                document.getElementById('guessButton').disabled = true;
+            } else if (guess > targetNumber) {
+                document.getElementById('result').innerText = `Your guess is too high. You have ${maxAttempts - attempts} attempts left. Try again!`;
+            } else {
+                document.getElementById('result').innerText = `Your guess is too low. You have ${maxAttempts - attempts} attempts left. Try again!`;
+            }
+        }
+
+        function calculateScore(attempts) {
+            return Math.max(0, 100 - ((attempts - 1) / maxAttempts) * 100);
+        }
+    </script>
+</body>
+</html>
